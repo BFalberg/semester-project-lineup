@@ -9,6 +9,24 @@ This project is made in collaboration with:
 - [Dennis](https://github.com/DennisRussell0)
 - [Sergio](https://github.com/smw22)
 
+# Run the project
+
+To get started fast, you can run the follwoing command.
+
+```bash
+npm run setup
+```
+
+This install dependencies, create a db file, add the db struture and seed the database.
+
+. **Test Login Credentials**
+You can log in with the following test user:
+
+- **User:** `test@user.com`
+- **Password:** `admin`
+
+Alternatively, register a new user via the onboarding flow.
+
 # Project Technologies Overview
 
 This project, Lineup, is a full-stack web application built with a modern technology stack designed for scalability, maintainability, and a great user experience.

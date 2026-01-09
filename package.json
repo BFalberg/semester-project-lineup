@@ -4,7 +4,8 @@
   "description": "Semester Project - Lineup",
   "main": "index.js",
   "scripts": {
-    "dev": "npm run dev -w frontend & npm run start:dev -w backend"
+    "dev": "npm run dev -w frontend & npm run start:dev -w backend",
+    "setup": "npm install && [ -f db.sqlite ] || touch db.sqlite && npm run build -w backend && npm run seed -w backend"
   },
   "repository": {
     "type": "git",
