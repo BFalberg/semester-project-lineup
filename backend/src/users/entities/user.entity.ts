@@ -59,19 +59,19 @@ export class User {
   @Column("simple-array")
   looking_for: string[];
 
-  @Column()
+  @Column({ nullable: true, default: null })
   subscription: string;
 
-  @Column()
+  @Column({ nullable: true, default: null })
   user_type: string;
 
-  @Column("simple-array")
+  @Column("simple-array", { nullable: true, default: null })
   genres: string[];
 
   @Column()
   profile_image: string;
 
-  @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
+  @Column({ type: "datetime", default: () => "CURRENT_TIMESTAMP" })
   created: Date;
 
   @OneToMany(() => Post, (post) => post.user)
@@ -82,7 +82,7 @@ export class User {
 
   @OneToMany(() => Connection, (conn) => conn.addressee)
   connections_received: Connection[];
-  
+
   @ManyToMany(() => Collaboration, (collab) => collab.users)
   collaborations: Collaboration[];
 }

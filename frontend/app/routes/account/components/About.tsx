@@ -55,7 +55,7 @@ export default function About({
       <section>
         <h5 className="font-normal text-gray-400! text-sm">Genres</h5>
         <div className="flex flex-row gap-1 mx-4 my-3">
-          {profile.genres.map((str, index) => (
+          {(profile.genres ?? []).map((str, index) => (
             <p key={index} className={`inline-flex text-white bg-${profile.theme} capitalize px-3 py-1 rounded-full`}>
               {str}
             </p>
