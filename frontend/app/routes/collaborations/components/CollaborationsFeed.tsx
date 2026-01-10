@@ -9,9 +9,14 @@ import { InfiniteScroll } from "~/components/InfiniteScroll";
 import { getAllCollaborations } from "~/lib/data/collaborationData";
 import CollaborationsCardRedacted from "./CollaborationsCardRedacted";
 
-function CollabCard({ children }: React.PropsWithChildren<{}>) {
+function CollabCard({ children, id }: React.PropsWithChildren<{ id: string }>) {
   return (
-    <div className="bg-white border border-black/10 p-4 rounded-3xl overflow-hidden flex flex-col gap-4 h-full">{children}</div>
+    <div
+      className="bg-white border border-black/10 p-4 rounded-3xl overflow-hidden flex flex-col gap-4 h-full"
+      style={{ viewTransitionName: `collaboration-${id}` }}
+    >
+      {children}
+    </div>
   );
 }
 
@@ -106,7 +111,7 @@ function CollabCardContent({ content }: { content: string }) {
 function CollabCardActions({ collabId, userId }: { collabId: string; userId: string }) {
   return (
     <div className="mt-auto flex items-center justify-between gap-4">
-      <Link className="text-gray-600 font-bold text-sm" to={`/collaborations/${collabId}`}>
+      <Link className="text-gray-600 font-bold text-sm" to={`/collaborations/${collabId}`} viewTransition>
         Read more
       </Link>
 
@@ -122,7 +127,7 @@ function CollaborationsCard({ collab }: { collab: Collaboration }) {
   const extraUsers = (collab.users ?? []).filter((u: any) => u.id !== collab.user.id);
   const allUsers = [collab.user, ...extraUsers];
   return (
-    <CollabCard key={collab.id}>
+    <CollabCard key={collab.id} id={collab.id}>
       <CollabCardHeader users={allUsers} role={collab.role} />
       <CollabCardTitle title={collab.title} />
       <CollabCardMeta location={collab.location} created={collab.created} tags={collab.tags} />
@@ -135,13 +140,15 @@ function CollaborationsCard({ collab }: { collab: Collaboration }) {
 
 export default function CollaborationsFeed({ collaborations }: { collaborations: Collaboration[] }) {
   return (
-    <InfiniteScroll<Collaboration>
-      fetchPage={getAllCollaborations}
-      initialData={collaborations}
-      pageSize={10}
-      loader={<CollaborationsCardRedacted />}
-      className="flex flex-col gap-4"
-      renderItem={(collab) => <CollaborationsCard key={collab.id} collab={collab} />}
-    />
+    <div className="outer-wrapper">
+      <InfiniteScroll<Collaboration>
+        fetchPage={getAllCollaborations}
+        initialData={collaborations}
+        pageSize={10}
+        loader={<CollaborationsCardRedacted />}
+        className="flex flex-col gap-4"
+        renderItem={(collab) => <CollaborationsCard key={collab.id} collab={collab} />}
+      />
+    </div>
   );
 }

@@ -153,7 +153,7 @@ export default function CollaborationDetails() {
   const allUsers = [collab.user, ...extraUsers];
 
   return (
-    <div className="px-4 flex flex-col gap-4 outer-wrapper">
+    <div className="px-4 flex flex-col gap-4 outer-wrapper" style={{ viewTransitionName: `collaboration-${collab.id}` }}>
       <CollabHeader users={allUsers} role={collab.role} created={collab.created} />
       <CollabTags tags={collab.tags} />
       <CollabTitle title={collab.title} />
