@@ -26,6 +26,20 @@ export class CollaborationsService {
     private readonly usersRepository: Repository<User>
   ) {}
 
+  private mapUserFields(user: any) {
+    return user
+      ? {
+          id: user.id,
+          name: user.name,
+          profile_image: user.profile_image,
+        }
+      : null;
+  }
+
+  private mapUsersArray(users: any[]) {
+    return Array.isArray(users) ? users.map((u) => this.mapUserFields(u)) : [];
+  }
+
   async create(createCollaborationDto: CreateCollaborationDto, userId: string): Promise<Collaboration> {
     const genres = createCollaborationDto.genreIds
       ? await this.genresRepository.findByIds(createCollaborationDto.genreIds)
@@ -47,13 +61,7 @@ export class CollaborationsService {
     return await this.collaborationRepository.save(collabData);
   }
 
-  async findAll(
-    page = 1,
-    limit = 10,
-    genre = "",
-    orderBy = "created",
-    tags: string[] = []
-  ): Promise<{ data: Collaboration[] }> {
+  async findAll(page = 1, limit = 10, genre = "", orderBy = "created", tags: string[] = []): Promise<any> {
     const query = this.collaborationRepository.createQueryBuilder("collaboration");
 
     if (genre) {
@@ -88,11 +96,16 @@ export class CollaborationsService {
       .take(limit);
 
     const data = await query.getMany();
-
-    return { data };
+    // Map user fields
+    const mappedData = data.map((collab) => ({
+      ...collab,
+      user: this.mapUserFields(collab.user),
+      users: this.mapUsersArray(collab.users),
+    }));
+    return { data: mappedData };
   }
 
-  async findOne(id: string): Promise<Collaboration> {
+  async findOne(id: string): Promise<any> {
     const collabData = await this.collaborationRepository.findOne({
       where: { id },
       relations: ["user", "users"],
@@ -100,10 +113,15 @@ export class CollaborationsService {
     if (!collabData) {
       throw new HttpException("Collaboration not found", 404);
     }
-    return collabData;
+    // Map user fields
+    return {
+      ...collabData,
+      user: this.mapUserFields(collabData.user),
+      users: this.mapUsersArray(collabData.users),
+    };
   }
 
-  async update(id: string, updateCollaborationDto: UpdateCollaborationDto): Promise<Collaboration> {
+  async update(id: string, updateCollaborationDto: UpdateCollaborationDto): Promise<any> {
     if (!updateCollaborationDto || Object.keys(updateCollaborationDto).length === 0) {
       throw new HttpException("No update values provided", 400);
     }
@@ -112,14 +130,41 @@ export class CollaborationsService {
       throw new HttpException("Collaboration not found", 404);
     }
     const collabData = this.collaborationRepository.merge(existingCollab, updateCollaborationDto);
-    return await this.collaborationRepository.save(collabData);
+    const saved = await this.collaborationRepository.save(collabData);
+    // Fetch with relations for mapping
+    const withRelations = await this.collaborationRepository.findOne({
+      where: { id: saved.id },
+      relations: ["user", "users"],
+    });
+    if (!withRelations) {
+      return null;
+    }
+    return {
+      ...withRelations,
+      user: this.mapUserFields(withRelations.user),
+      users: this.mapUsersArray(withRelations.users),
+    };
   }
 
-  async remove(id: string) {
+  async remove(id: string): Promise<any> {
     const existingCollab = await this.collaborationRepository.findOneBy({ id });
     if (!existingCollab) {
       throw new HttpException("Collaboration not found", 404);
     }
-    return await this.collaborationRepository.remove(existingCollab);
+    // Optionally fetch with relations for mapping before removal
+    const withRelations = await this.collaborationRepository.findOne({
+      where: { id },
+      relations: ["user", "users"],
+    });
+    let mapped: any = null;
+    if (withRelations) {
+      mapped = {
+        ...withRelations,
+        user: this.mapUserFields(withRelations.user),
+        users: this.mapUsersArray(withRelations.users),
+      };
+    }
+    await this.collaborationRepository.remove(existingCollab);
+    return mapped;
   }
 }

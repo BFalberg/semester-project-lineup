@@ -1,4 +1,16 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Req } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+  Req,
+  NotFoundException,
+  ForbiddenException,
+} from "@nestjs/common";
 import { CollaborationsService } from "./collaborations.service";
 import { CreateCollaborationDto } from "./dto/create-collaboration.dto";
 import { UpdateCollaborationDto } from "./dto/update-collaboration.dto";
@@ -54,20 +66,18 @@ export class CollaborationsController {
 
   @Get(":id")
   async findOne(@Param("id") id: string) {
-    try {
-      const data = await this.collaborationsService.findOne(id);
-      return {
-        success: true,
-        data,
-        message: "Collaboration retrieved successfully",
-      };
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      return {
+    const data = await this.collaborationsService.findOne(id);
+    if (!data) {
+      throw new NotFoundException({
         success: false,
-        message,
-      };
+        message: "Collaboration not found",
+      });
     }
+    return {
+      success: true,
+      data,
+      message: "Collaboration retrieved successfully",
+    };
   }
 
   @Patch(":id")
@@ -76,55 +86,51 @@ export class CollaborationsController {
     @Body() updateCollaborationDto: UpdateCollaborationDto,
     @Req() req: Request & { user: { id: string } }
   ) {
-    try {
-      const userId = req.user.id;
-      const collaboration = await this.collaborationsService.findOne(id);
-      if (!collaboration) {
-        throw new Error("Collaboration not found");
-      }
-      if (collaboration.user.id !== userId) {
-        throw new Error("You are not authorized to update this collaboration");
-      }
-      const data = await this.collaborationsService.update(id, updateCollaborationDto);
-      return {
-        success: true,
-        data,
-        message: "Collaboration updated successfully",
-      };
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      return {
+    const userId = req.user.id;
+    const collaboration = await this.collaborationsService.findOne(id);
+    if (!collaboration) {
+      throw new NotFoundException({
         success: false,
-        message,
-      };
+        message: "Collaboration not found",
+      });
     }
+    if (collaboration.user.id !== userId) {
+      throw new ForbiddenException({
+        success: false,
+        message: "You are not authorized to update this collaboration",
+      });
+    }
+    const data = await this.collaborationsService.update(id, updateCollaborationDto);
+    return {
+      success: true,
+      data,
+      message: "Collaboration updated successfully",
+    };
   }
 
   @Delete(":id")
   async remove(@Param("id") id: string, @Req() req: Request & { user: { id: string } }) {
-    try {
-      const userId = req.user.id;
-      const collaboration = await this.collaborationsService.findOne(id);
-      if (!collaboration) {
-        throw new Error("Collaboration not found");
-      }
-      if (collaboration.user.id !== userId) {
-        throw new Error("You are not authorized to delete this collaboration");
-      }
-      const data = await this.collaborationsService.remove(id);
-      return {
-        success: true,
-        data: {
-          title: data.title,
-        },
-        message: "Collaboration removed successfully",
-      };
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      return {
+    const userId = req.user.id;
+    const collaboration = await this.collaborationsService.findOne(id);
+    if (!collaboration) {
+      throw new NotFoundException({
         success: false,
-        message,
-      };
+        message: "Collaboration not found",
+      });
     }
+    if (collaboration.user.id !== userId) {
+      throw new ForbiddenException({
+        success: false,
+        message: "You are not authorized to delete this collaboration",
+      });
+    }
+    const data = await this.collaborationsService.remove(id);
+    return {
+      success: true,
+      data: {
+        title: data.title,
+      },
+      message: "Collaboration removed successfully",
+    };
   }
 }

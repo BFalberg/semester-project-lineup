@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Req } from "@nestjs/common";
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Req, NotFoundException } from "@nestjs/common";
 import { PostsService } from "./posts.service";
 import { CreatePostDto } from "./dto/create-post.dto";
 import { UpdatePostDto } from "./dto/update-post.dto";
@@ -57,6 +57,9 @@ export class PostsController {
     try {
       const userId = req.user.id;
       const data = (await this.postsService.findOne(id, userId)) as PostEntity | null;
+      if (!data) {
+        throw new NotFoundException("Post not found");
+      }
       return {
         success: true,
         data,

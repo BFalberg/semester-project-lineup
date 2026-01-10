@@ -18,10 +18,6 @@ export class Collaboration {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  @ManyToOne(() => User, { eager: true, onDelete: "CASCADE" })
-  @JoinColumn({ name: "user_id" })
-  user: User;
-
   @Column({ nullable: true })
   media: string;
 
@@ -54,6 +50,10 @@ export class Collaboration {
   @ManyToMany(() => Skill, { eager: true })
   @JoinTable({ name: "collaboration_skills" })
   skills: Skill[];
+
+  @ManyToOne(() => User, { eager: true, onDelete: "CASCADE" })
+  @JoinColumn({ name: "user_id" })
+  user: User;
 
   @ManyToMany(() => User, { eager: true })
   @JoinTable({ name: "collaboration_users" })
