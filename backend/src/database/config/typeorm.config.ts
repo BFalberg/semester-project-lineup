@@ -6,13 +6,9 @@ config();
 const configService = new ConfigService();
 
 const AppDataSource = new DataSource({
-  type: "mysql",
-  host: configService.get<string>("DB_HOST"),
-  port: 3306,
-  username: configService.get<string>("DB_USER"),
-  password: configService.get<string>("DB_PASSWORD"),
-  database: configService.get<string>("DB_NAME"),
-  synchronize: false,
+  type: "sqlite",
+  database: "../db.sqlite",
+  synchronize: true,
   entities: ["**/*.entity.ts"],
   migrations: ["src/database/migrations/*-migration.ts"],
   migrationsRun: false,

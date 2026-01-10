@@ -45,12 +45,8 @@ import { UploadthingModule } from "./uploadthing/uploadthing.module";
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot({
-      type: "mysql",
-      host: process.env.DB_HOST,
-      port: 3306,
-      username: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
+      type: "sqlite",
+      database: "../db.sqlite",
       entities: [
         User,
         Post,
@@ -70,7 +66,7 @@ import { UploadthingModule } from "./uploadthing/uploadthing.module";
         Skill,
         Connection,
       ],
-      synchronize: false,
+      synchronize: true,
     }),
     UsersModule,
     PostsModule,
