@@ -1,4 +1,4 @@
-import { Injectable, HttpException } from "@nestjs/common";
+import { Injectable, HttpException, NotFoundException } from "@nestjs/common";
 import { CreateCollaborationDto } from "./dto/create-collaboration.dto";
 import { UpdateCollaborationDto } from "./dto/update-collaboration.dto";
 
@@ -110,10 +110,11 @@ export class CollaborationsService {
       where: { id },
       relations: ["user", "users"],
     });
+
     if (!collabData) {
-      throw new HttpException("Collaboration not found", 404);
+      throw new NotFoundException("Collaboration not found");
     }
-    // Map user fields
+
     return {
       ...collabData,
       user: this.mapUserFields(collabData.user),

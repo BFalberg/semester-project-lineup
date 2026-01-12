@@ -67,12 +67,7 @@ export class CollaborationsController {
   @Get(":id")
   async findOne(@Param("id") id: string) {
     const data = await this.collaborationsService.findOne(id);
-    if (!data) {
-      throw new NotFoundException({
-        success: false,
-        message: "Collaboration not found",
-      });
-    }
+
     return {
       success: true,
       data,
