@@ -217,7 +217,7 @@ export default function ProfileEdit() {
           <div className="p-4 flex gap-4 flex-col sm:flex-row">
             <p className="py-2 w-20 min-w-20">What I am looking for</p>
             <EditArray
-              array={userLookingFor}
+              array={userLookingFor ?? []}
               editableText={true}
               placeholder="Write what you're looking for..."
               onChange={(e: string[]) => setUserLookingFor(e)}
@@ -227,13 +227,14 @@ export default function ProfileEdit() {
           <div className="p-4 flex gap-4 flex-col md:flex-row">
             <p className="py-2 w-20 min-w-20">Genres</p>
             <EditArray
-              array={userGenres}
+              array={userGenres ?? []}
               editableText={false}
               selectOptions={genres.data.map((genre: { id: string; title: string }) => genre.title)}
               placeholder="Pick genre..."
               onChange={(e: string[]) => setUserGenres(e)}
             />
-            <input value={userGenres.toString()} name="genres" type="hidden" />
+            {userGenres?.length === 0 && <p className="text-xs text-neutral-500 mt-2">You have not added any genres yet.</p>}
+            <input value={(userGenres ?? []).join(",")} name="genres" type="hidden" />
           </div>
           <div className="p-4 flex gap-4 flex-col md:flex-row">
             <p className="py-2 w-20 min-w-20">Theme</p>
@@ -414,7 +415,7 @@ export default function ProfileEdit() {
             <div className="gap-2 flex flex-col my-3 w-full">
               <p className="text-xs text-neutral-500">Add YouTube links to display videos on your profile.</p>
               <EditArray
-                array={userVideos}
+                array={userVideos ?? []}
                 editableText={true}
                 placeholder="Input a YouTube URL..."
                 onChange={(e: string[]) => setUserVideos(e)}
